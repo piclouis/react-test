@@ -3,22 +3,47 @@ import Counter from '../Counter/Counter';
 import Pagination from '../Pagination/Pagination';
 import './counters.scss';
 
+const nbItemsPerPage = 3;
+
 class Counters extends Component {
   state = {}
+  
 
   constructor(props) {
     super(props);
 
-    const nbItemsPerPage = 3;
-    const totalPages = Math.ceil(props.counters.length / nbItemsPerPage);
+    this.state.pagination = this.initPagination(props.counters);
+  }
 
-    this.state.pagination = {
-      currentPage: 1,
+  componentDidUpdate(prevProps) {
+    debugger;
+    if (this.props.counters.length !== prevProps.counters.length) {     
+      const pagination = this.initPagination(this.props.counters, this.state.pagination.currentPage);
+      this.setState({pagination});
+    }
+  } 
+
+  initPagination = (counters, currentPage = 1) => {
+    const totalPages = this.calculateTotalPages(counters);
+    currentPage = currentPage <= totalPages ? currentPage : totalPages;
+
+    return {
+      currentPage: currentPage,
       totalPages : totalPages,
       nbItemsPerPage: nbItemsPerPage
-    }
-
+    };    
   }
+
+  calculateTotalPages = (counters) => {
+    let totalPages = 1;
+
+    if (counters.length !== 0 && nbItemsPerPage !== 0 ) {
+      totalPages = Math.ceil(counters.length / nbItemsPerPage);
+    }  
+
+    return totalPages;
+  }
+
 
   handleNextPage = () => {
     let pagination = this.state.pagination;
